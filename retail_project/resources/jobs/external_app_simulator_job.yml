@@ -1,0 +1,30 @@
+resources:
+  jobs:
+    External_App_Simulator_Job:
+      name: External App Simulator Job
+      tasks:
+        - task_key: select_next_date
+          notebook_task:
+            notebook_path: ../../src/external_app/select_next_date.ipynb
+            source: WORKSPACE
+        - task_key: publish_transactions
+          depends_on:
+            - task_key: select_next_date
+          notebook_task:
+            notebook_path: ../../src/external_app/publish_transactions.ipynb
+            base_parameters:
+              selected_date: "{{tasks.select_next_date.values.selected_date}}"
+            source: WORKSPACE
+        - task_key: record_publication
+          depends_on:
+            - task_key: publish_transactions
+          notebook_task:
+            notebook_path: ../../src/external_app/record_publication.ipynb
+            base_parameters:
+              selected_date: "{{tasks.publish_transactions.values.selected_date}}"
+              file_path: "{{tasks.publish_transactions.values.file_path}}"
+              row_count: "{{tasks.publish_transactions.values.row_count}}"
+            source: WORKSPACE
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED

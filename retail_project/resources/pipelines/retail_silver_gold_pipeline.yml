@@ -1,0 +1,13 @@
+resources:
+  pipelines:
+    retail_silver_gold_pipeline:
+      name: retail_silver_gold_pipeline
+      libraries:
+        - glob:
+            include: ../../src/retail_silver_gold_pipeline/transformations/**
+      schema: bronze
+      photon: true
+      channel: CURRENT
+      catalog: retail_project
+      serverless: true
+      root_path: ../../src/retail_silver_gold_pipeline
