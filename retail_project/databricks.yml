@@ -1,0 +1,43 @@
+# This is a Declarative Automation Bundle definition for retail_project.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: retail_project
+  uuid: e724e8db-27a9-407e-89be-19614d79cf51
+
+include:
+  - resources/*.yml
+  - resources/*/*.yml
+
+variables:
+  landing_path:
+    description: "Location monitored for incoming retail CSV files"
+    default: /Volumes/retail_project/landing/raw_files/
+
+targets:
+  dev:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-61f4c996-bd79.cloud.databricks.com
+      sync_mode: overwrite
+      root_path: /Workspace/DEV/${workspace.current_user.userName}/retail_project
+    permissions:
+      - user_name: kaan.turgut.work@gmail.com
+        level: CAN_MANAGE
+    presets:
+      name_prefix: ${workspace.current_user.short_name}
+  
+
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-61f4c996-bd79.cloud.databricks.com
+      # We explicitly deploy to /Workspace/Users/kaan.turgut.work@gmail.com to make sure we only have a single copy.
+      root_path: /Workspace/PROD/${workspace.current_user.userName}/retail_project
+    permissions:
+      - user_name: kaan.turgut.work@gmail.com
+        level: CAN_MANAGE

@@ -1,0 +1,22 @@
+resources:
+  jobs:
+    retail_ingestion_transformation:
+      name: retail_ingestion_transformation
+      trigger:
+        pause_status: PAUSED
+        file_arrival:
+          url: ${var.landing_path}
+      tasks:
+        - task_key: ingest_incoming
+          notebook_task:
+            notebook_path: ../../src/bronze/002_bronze_ingestion.ipynb
+            source: WORKSPACE
+        - task_key: silver_gold_etl_pipeline
+          depends_on:
+            - task_key: ingest_incoming
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.retail_silver_gold_pipeline.id}
+            full_refresh: false
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
